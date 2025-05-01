@@ -1,66 +1,105 @@
-# Fluig em Docker (para desenvolvimento)
+# 🚀 Fluig in Docker (Development Environment)
 
-Configuração para ter o Fluig rodando em um ambiente de desenvolvimento em Docker.
+[![Docker](https://img.shields.io/badge/Docker-Supported-blue)](https://www.docker.com/)
+[![License Required](https://img.shields.io/badge/License-TOTVS--Fluig-yellow)](https://suporte.totvs.com/)
+[![Fluig Version](https://img.shields.io/badge/Fluig-1.8.1-green)](https://suporte.totvs.com/)
+[![MailDev](https://img.shields.io/badge/MailDev-Enabled-orange)](https://github.com/maildev/maildev)
 
-Esse repositório **NÃO CONTÉM** o instalador do Fluig, pois somente usuários credenciados podem baixar
-o instalador.
+This project provides a Docker setup to run **Fluig** in a local development environment.
 
-A utilização do Fluig depende de um Servidor de Licenças válido. Caso não configure um Servidor
-de Licenças no Fluig você só conseguirá utilizar o modo demonstração por 7 dias.
+> ⚠️ **Important:** This repository **DOES NOT** include the Fluig installer, as it is restricted to authorized TOTVS users. You must download it manually from the official TOTVS website.
 
-Por enquanto, para facilitar, a configuração de domain e host são sobreescritas, pois encontrei
-muita dificuldade em configurar automaticamente o Fluig para ouvir em todas as redes ao invés
-de somente a do container.
+---
 
-## Containers
+## 📌 Requirements
 
-- Fluig;
-- MySQL 8.0
-- MailDev (para testar envio de e-mail);
+- Valid **License Server** (Fluig only runs in demo mode for 7 days without one).
+- Fluig Installer 1.8.1 for Linux (download from the [TOTVS Download Center](https://suporte.totvs.com/portal/p/10098/suporte-fluig-download#000035/FLUIG%201.8/Fluig/)).
 
-## Iniciando
+---
 
-Baixe o instalador do Fluig 1.8.1 para Linux na [Central de Download da TOTVS](https://suporte.totvs.com/portal/p/10098/suporte-fluig-download#000035/FLUIG%201.8/Fluig/).
+## 🐳 Containers
 
-Descompacte o conteúdo do arquivo na pasta `image/installer`;
+This setup includes the following services via Docker:
 
-Caso necessário altere o TimeZone no arquivo `.env` (por padrão está America/Sao_Paulo).
-Isso só terá validade ao criar a imagem.
+- `Fluig`
+- `MySQL 8.0`
+- `MailDev` (for testing email delivery)
 
-No terminal execute o comando `docker compose up -d` para levantar os serviços.
+---
 
-Na primeira vez que executar este comando o Docker fará o build da imagem do Fluig,
-rodando a instalação e efetuando as configurações.
+## ⚙️ Getting Started
 
-Lembre-se: ao instalar o Fluig será necessário criar a empresa entrando no WCMAdmin.
+1. Download the Fluig 1.8.1 installer (Linux) and extract it into the folder:
 
-- Login: wcmadmin
-- Senha: adm
+   ```
+   image/installer/
+   ```
 
-O diretório `/var/fluig-volume` é persistido no Docker, por isso o utilize como diretório
-base para os volumes das empresas criadas. Assim cada empresa deve ter seu volume indicado
-como um subdiretório de `/var/fluig-volume`. Ex: `/var/fluig-volume/empresa001`.
+2. (Optional) Change the `TZ` (timezone) in the `.env` file (default is `America/Sao_Paulo`).
 
-O Fluig será acessado no endereço <http://127.0.0.1:8080>
+3. Run the following command to start the containers:
 
-O MailDev (para visualizar os e-mails) será acessado no endereço <http://127.0.0.1:1080>
+   ```bash
+   docker compose up -d
+   ```
 
-O banco de dados está acessível em `localhost` na porta `3306`.
+   On first run, Docker will build the custom Fluig image, run the installer, and apply initial settings.
 
-Caso tente acessar o banco de dados pelo DBeaver é necessário alterar o tipo de conexão para URL e colocar a seguinte URL: `jdbc:mysql://localhost:3306/fluig?allowPublicKeyRetrieval=true&useSSL=false`
+---
 
-- Usuário: root
-- Senha: rootpassword
+## 🔐 Default Login (Initial Setup)
 
-## Comandos
+After installation, access Fluig and create your company via **WCMAdmin**:
 
-Os comandos a seguir são executados no terminal.
+- **URL:** [http://127.0.0.1:8080](http://127.0.0.1:8080)  
+- **Login:** `wcmadmin`  
+- **Password:** `adm`  
 
-- Iniciar os serviços: `docker compose up -d`;
-- Parar os serviços: `docker compose stop`;
-- Parar os serviços e deletar os containers¹: `docker compose down`;
-- Entrar no bash do container do Fluig para executar comandos: `docker compose exec fluig bash`;
-- Visualizar o log do Fluig (primeiro entre no bash do container): `log`;
+---
 
-¹ Se ao deletar os containers quiser uma instalação do zero é importante remover o volume criado,
-na aplicação Docker, para não influenciar na nova instalação.
+## 🗂 Persistent Volumes
+
+Fluig volumes are persisted at:
+
+```
+/var/fluig-volume
+```
+
+For each company, use a dedicated subdirectory, e.g.:
+
+```
+/var/fluig-volume/company001
+```
+
+---
+
+## 📧 MailDev & Database Access
+
+- **MailDev (view sent emails):** [http://127.0.0.1:1080](http://127.0.0.1:1080)
+- **MySQL Database:**
+  - Host: `localhost`
+  - Port: `3306`
+  - User: `root`
+  - Password: `rootpassword`
+  - JDBC URL (for DBeaver, use URL connection mode):
+  
+    ```
+    jdbc:mysql://localhost:3306/fluig?allowPublicKeyRetrieval=true&useSSL=false
+    ```
+
+---
+
+## 🧪 Useful Docker Commands
+
+Run the following in your terminal:
+
+| Action                                   | Command                                 |
+|------------------------------------------|------------------------------------------|
+| Start all services                       | `docker compose up -d`                   |
+| Stop services                            | `docker compose stop`                    |
+| Stop and remove all containers¹          | `docker compose down`                    |
+| Access Fluig container bash              | `docker compose exec fluig bash`         |
+| View Fluig logs (inside the container)   | `log`                                    |
+
+> ¹ If you want a clean install, remove the Docker volume manually via Docker Desktop or CLI to avoid residual data.
